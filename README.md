@@ -2,6 +2,9 @@
 
 本地 AI 编码工具的用量监控 + 聊天记录导出。支持 [Reasonix](https://github.com/nichuanfang/reasonix) 和 [opencode](https://github.com/opencode-ai/opencode)。
 
+![仪表盘预览](docs/dashboard.png)
+*仪表盘预览（仅模拟数据，非真实数据截图）*
+
 ## 功能
 
 - **用量仪表盘** — 实时查看两个工具的 API Token 消耗、模型分布、每日趋势
