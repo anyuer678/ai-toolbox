@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 工具箱</title>
+<style>
+:root{--bg:#fafaf8;--sf:#fff;--sm:#f3f2ec;--bd:#e8e8e4;--tx:#1f1f1d;--ts:#6e6e68;--ac:#b05c3a;--a2:#97492c;--af:#f6e9e1;--gn:#336b43;--gf:#e6f0e8;--pu:#5a4b8a;--pf:#ece9f4;--er:#c0392b;--ef:#fce4e4;--fs:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;--fd:Georgia,"Songti SC","Noto Serif SC",serif;--fm:ui-monospace,"SF Mono","Cascadia Code",Consolas,monospace;--r1:4px;--r2:8px;--r3:12px}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--fs);font-size:15px;line-height:1.6}
+.ct{max-width:960px;margin:0 auto;padding:0 clamp(16px,4vw,32px)}
+a{color:var(--ac);text-decoration:none}a:hover{color:var(--a2);text-decoration:underline}
+
+/* Header */
+.hd{padding:48px 0 32px;border-bottom:1px solid var(--bd)}
+.hd h1{font-family:var(--fd);font-size:28px;line-height:1.3;margin:0}
+.hd .sub{margin-top:4px;font-size:14px;color:var(--ts)}
+.hd .mt{margin-top:12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.hd .mt span{font-family:var(--fm);font-size:13px;color:var(--ts)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 18px;font-size:13px;font-family:var(--fm);border:1px solid var(--ac);border-radius:var(--r2);background:transparent;color:var(--ac);cursor:pointer;transition:all .15s}
+.btn:hover{background:var(--af)}
+.btn:active{transform:scale(.97)}
+.btn--g{border-color:var(--gn);color:var(--gn)}.btn--g:hover{background:var(--gf)}
+.btn--o{border-color:var(--pu);color:var(--pu)}.btn--o:hover{background:var(--pf)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:var(--r2);font-size:14px;z-index:999;transition:all .3s;opacity:0;transform:translateY(-10px)}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast--ok{background:var(--gf);color:var(--gn);border:1px solid var(--gn)}
+.toast--er{background:var(--ef);color:var(--er);border:1px solid var(--er)}
+
+/* Nav */
+.nav{display:flex;gap:4px;margin:32px 0 0;border-bottom:2px solid var(--bd)}
+.nav button{padding:10px 20px;font-size:14px;font-family:var(--fs);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--ts);cursor:pointer;transition:all .15s}
+.nav button:hover{color:var(--tx)}
+.nav button.on{color:var(--ac);border-bottom-color:var(--ac);font-weight:600}
+.page{display:none;padding:32px 0}.page.on{display:block}
+
+/* Cards */
+.su{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.cd{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);padding:20px}
+.cd-l{font-size:13px;color:var(--ts);margin-bottom:4px}
+.cd-v{font-family:var(--fd);font-size:28px;line-height:1.2}
+.cd-s{font-family:var(--fm);font-size:12px;color:var(--ts);margin-top:4px}
+.cd--a .cd-v{color:var(--ac)}.cd--g .cd-v{color:var(--gn)}.cd--p .cd-v{color:var(--pu)}
+
+/* Section */
+.sc{margin:40px 0}
+.st{font-family:var(--fd);font-size:20px;line-height:1.4;margin-bottom:16px;display:flex;align-items:baseline;gap:8px}
+.st .n{font-family:var(--fm);font-size:13px;color:var(--ts)}
+.bd{display:inline-block;padding:2px 8px;font-size:12px;line-height:1.5;border-radius:var(--r1);white-space:nowrap}
+.bd--r{color:var(--ac);background:var(--af)}.bd--o{color:var(--pu);background:var(--pf)}
+
+/* Table */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);overflow:hidden}
+th{text-align:left;padding:10px 14px;font-size:12px;font-weight:600;color:var(--ts);background:var(--sm);border-bottom:1px solid var(--bd);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--bd);font-size:14px;white-space:nowrap}
+tr:last-child td{border-bottom:none}tr:hover{background:var(--sm)}
+.nm{text-align:right;font-family:var(--fm);font-size:13px}.hl{color:var(--ac);font-weight:600}.mn{font-family:var(--fm);font-size:13px}
+
+/* Chart */
+.cc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);padding:20px;margin:16px 0;overflow-x:auto}
+.cb{display:flex;align-items:flex-end;gap:3px;min-width:100%;height:160px;padding-top:8px}
+.br{flex:1;border-radius:2px 2px 0 0;min-width:4px;transition:height .3s}
+.br-r{background:var(--ac)}.br-o{background:var(--pu)}
+.cl{display:flex;gap:2px;margin-top:4px}.cl span{flex:1;text-align:center;font-size:10px;font-family:var(--fm);color:var(--ts);overflow:hidden}
+.clg{display:flex;gap:16px;margin-top:12px;font-size:13px}.clg span{display:flex;align-items:center;gap:6px}.clg .d{width:10px;height:10px;border-radius:2px}
+
+/* Loading */
+.ld{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--ts);font-size:14px;gap:8px}
+.ld::before{content:"";width:18px;height:18px;border:2px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite}
+
+.ft{margin-top:48px;padding:24px 0;border-top:1px solid var(--bd);font-size:13px;color:var(--ts)}
+@media(max-width:640px){.su{grid-template-columns:1fr 1fr}.cd-v{font-size:22px}th,td{padding:8px 10px;font-size:12px}}
+</style>
+</head>
+<body>
+<div class="ct">
+<div class="hd">
+    <h1>AI 工具箱</h1>
+    <div class="sub">Reasonix & opencode 用量监控 + 聊天记录管理</div>
+    <div class="mt">
+        <span id="update-time">加载中...</span>
+        <button class="btn" id="btn-refresh" onclick="refreshData()">&#x21bb; 刷新用量</button>
+        <button class="btn btn--g" id="btn-export" onclick="exportChats()">&#x21e3; 导出聊天记录</button>
+    </div>
+</div>
+
+<div class="nav">
+    <button class="on" onclick="showPage('usage',this)">用量总览</button>
+    <button onclick="showPage('reasonix',this)">Reasonix</button>
+    <button onclick="showPage('opencode',this)">opencode</button>
+    <button onclick="showPage('compare',this)">对比</button>
+</div>
+
+<!-- 用量总览 -->
+<div class="page on" id="p-usage">
+    <div class="su" id="summary-cards"><div class="ld">正在加载数据...</div></div>
+    <div class="sc"><div class="st"><span class="n">01</span> 每日用量趋势（近 30 天）</div>
+    <div class="cc"><div class="cb" id="chart"></div><div class="cl" id="chart-labels"></div>
+    <div class="clg"><span><span class="d" style="background:var(--ac)"></span> Reasonix</span><span><span class="d" style="background:var(--pu)"></span> opencode</span></div></div></div>
+</div>
+
+<!-- Reasonix -->
+<div class="page" id="p-reasonix">
+    <div class="sc"><div class="st"><span class="n">01</span> 按模型 <span class="bd bd--r" id="r-badge">-</span></div>
+    <div class="tw"><table><thead><tr><th>模型</th><th class="nm">Prompt</th><th class="nm">Completion</th><th class="nm">Cache Hit</th><th class="nm">请求数</th><th class="nm">总 Token</th></tr></thead><tbody id="r-models"><tr><td colspan="6" class="ld">加载中...</td></tr></tbody></table></div></div>
+</div>
+
+<!-- opencode -->
+<div class="page" id="p-opencode">
+    <div class="sc"><div class="st"><span class="n">01</span> 按模型 <span class="bd bd--o" id="o-badge">-</span></div>
+    <div class="tw"><table><thead><tr><th>模型</th><th class="nm">Input</th><th class="nm">Output</th><th class="nm">Reasoning</th><th class="nm">Cache Read</th><th class="nm">费用</th></tr></thead><tbody id="o-models"><tr><td colspan="6" class="ld">加载中...</td></tr></tbody></table></div></div>
+</div>
+
+<!-- 对比 -->
+<div class="page" id="p-compare">
+    <div class="sc"><div class="st"><span class="n">01</span> 综合对比</div>
+    <div class="tw"><table><thead><tr><th>对比项</th><th class="nm">Reasonix</th><th class="nm">opencode</th></tr></thead><tbody id="cmp-table"><tr><td colspan="3" class="ld">加载中...</td></tr></tbody></table></div></div>
+    <div class="sc"><div class="st"><span class="n">02</span> 聊天记录统计</div>
+    <div class="tw"><table><thead><tr><th>来源</th><th class="nm">会话数</th><th class="nm">对话条数</th></tr></thead><tbody id="chat-table"><tr><td colspan="3" class="ld">加载中...</td></tr></tbody></table></div></div>
+</div>
+
+<div class="ft">数据实时采集自 Reasonix stats/*.jsonl + opencode opencode.db &middot; 本地服务驱动</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let DATA = null;
+function fs(n){if(n==null)return "0";n=Number(n);if(n>=1e8)return(n/1e8).toFixed(1)+"亿";if(n>=1e4)return(n/1e4).toFixed(1)+"万";return n.toLocaleString()}
+function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('on'));document.getElementById('p-'+id).classList.add('on');btn.classList.add('on')}
+function toast(msg,ok=true){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(ok?'toast--ok':'toast--er')+' show';setTimeout(()=>t.classList.remove('show'),3000)}
+
+async function refreshData(){
+    const btn=document.getElementById('btn-refresh');
+    btn.disabled=true; btn.innerHTML='<span class="spin">&#x21bb;</span> 采集中...';
+    try{
+        const r=await fetch('/api/data'); DATA=await r.json(); render(DATA);
+        toast('数据已更新 '+DATA.time);
+    }catch(e){toast('加载失败: '+e.message,false)}
+    btn.disabled=false; btn.innerHTML='&#x21bb; 刷新用量';
+}
+
+async function exportChats(){
+    const btn=document.getElementById('btn-export');
+    btn.disabled=true; btn.innerHTML='<span class="spin">&#x21e3;</span> 导出中...';
+    try{
+        const r=await fetch('/api/export'); const d=await r.json();
+        toast(`导出完成！${d.sessions} 个会话, ${d.messages} 条消息`);
+    }catch(e){toast('导出失败: '+e.message,false)}
+    btn.disabled=false; btn.innerHTML='&#x21e3; 导出聊天记录';
+}
+
+function render(D){
+    document.getElementById('update-time').textContent='更新: '+D.time;
+    const R=D.reasonix, O=D.opencode, C=D.chats;
+    const rt=R.totals, ot=O.totals;
+    const oTP=(ot.inp||0)+(ot.cache||0);
+    const rTP=rt.prompt+rt.cache_hit;
+
+    // Summary
+    document.getElementById('summary-cards').innerHTML=`
+        <div class="cd cd--a"><div class="cd-l">Reasonix 总 Token</div><div class="cd-v">${fs(rt.total)}</div><div class="cd-s">${rt.requests.toLocaleString()} 次请求</div></div>
+        <div class="cd cd--p"><div class="cd-l">opencode 总 Token</div><div class="cd-v">${fs(oTP)}</div><div class="cd-s">${ot.sessions||0} 个会话 · $${(ot.cost||0).toFixed(2)}</div></div>
+        <div class="cd cd--g"><div class="cd-l">合计总消耗</div><div class="cd-v">${fs(rt.total+oTP)}</div><div class="cd-s">两软件总计</div></div>
+        <div class="cd"><div class="cd-l">Reasonix Cache 命中率</div><div class="cd-v">${rt.cache_rate||0}%</div><div class="cd-s">缓存复用节省大量 token</div></div>`;
+
+    // Chart
+    const allDates=[...new Set([...Object.keys(R.daily),...O.daily.map(d=>d.date)])].sort();
+    const d30=allDates.slice(-30);
+    const odm={};O.daily.forEach(d=>odm[d.date]=d);
+    const vals=d30.map(d=>{
+        const rv=R.daily[d]?R.daily[d].tokens:0;
+        const od=odm[d]||{};
+        const ov=(od.cache||0)+(od.inp||0);
+        return rv+ov;
+    });
+    const mx=Math.max(...vals,1);
+    const chart=document.getElementById('chart'); chart.innerHTML='';
+    const labels=document.getElementById('chart-labels'); labels.innerHTML='';
+    d30.forEach(d=>{
+        const rv=R.daily[d]?R.daily[d].tokens:0;
+        const od=odm[d]||{};
+        const ov=(od.cache||0)+(od.inp||0);
+        const total=rv+ov;
+        const w=document.createElement('div');w.style.cssText='flex:1;display:flex;gap:1px;align-items:flex-end;height:100%';
+        const bR=document.createElement('div');bR.className='br br-r';bR.style.height=Math.max(1,rv/mx*100)+'%';bR.style.flex='1';
+        const bO=document.createElement('div');bO.className='br br-o';bO.style.height=Math.max(1,ov/mx*100)+'%';bO.style.flex='1';
+        // 悬浮窗：当日合计 + 各模型用量
+        let tip=d+'  合计: '+fs(total)+'\n';
+        tip+='─'.repeat(20)+'\n';
+        tip+='Reasonix: '+fs(rv)+'\n';
+        tip+='opencode: '+fs(ov)+'\n';
+        tip+='─'.repeat(20)+'\n';
+        tip+='【Reasonix 模型】\n';
+        Object.entries(R.models).sort((a,b)=>b[1].total-a[1].total).forEach(([m,d])=>{
+            if(d.total>0) tip+='  '+m.split('/').pop()+': '+fs(d.total)+'\n';
+        });
+        tip+='【opencode 模型】\n';
+        (O.models||[]).forEach(m=>{
+            const rp=(m.inp||0)+(m.cache||0);
+            if(rp>0) tip+='  '+(m.mid||'?')+': '+fs(rp)+'\n';
+        });
+        bR.title=tip; bO.title=tip;
+        w.appendChild(bR);w.appendChild(bO);chart.appendChild(w);
+        const l=document.createElement('span');l.textContent=d.slice(5);labels.appendChild(l);
+    });
+
+    // Reasonix models
+    document.getElementById('r-badge').textContent=rt.requests.toLocaleString()+' 次请求';
+    let rh='';R.models&&Object.entries(R.models).sort((a,b)=>b[1].total-a[1].total).forEach(([m,d])=>{
+        if(!d.total)return;const n=m.split('/').pop();
+        rh+=`<tr><td class="mn">${n}</td><td class="nm">${fs(d.prompt)}</td><td class="nm">${fs(d.completion)}</td><td class="nm">${fs(d.cache_hit)}</td><td class="nm">${d.requests.toLocaleString()}</td><td class="nm hl">${fs(d.total)}</td></tr>`;
+    });document.getElementById('r-models').innerHTML=rh||'<tr><td colspan="6" style="text-align:center;color:var(--ts)">无数据</td></tr>';
+
+    // opencode models
+    document.getElementById('o-badge').textContent=(ot.sessions||0)+' 个会话 · $'+(ot.cost||0).toFixed(2);
+    let oh='';(O.models||[]).forEach(m=>{
+        const rp=(m.inp||0)+(m.cache||0);if(!rp)return;
+        oh+=`<tr><td class="mn">${m.mid||'unknown'}</td><td class="nm">${fs(m.inp)}</td><td class="nm">${fs(m.out)}</td><td class="nm">${fs(m.reason)}</td><td class="nm">${fs(m.cache)}</td><td class="nm">$${(m.cost||0).toFixed(4)}</td></tr>`;
+    });document.getElementById('o-models').innerHTML=oh||'<tr><td colspan="6" style="text-align:center;color:var(--ts)">无数据</td></tr>';
+
+    // Compare
+    const oAll=oTP+(ot.out||0);
+    document.getElementById('cmp-table').innerHTML=`
+        <tr><td>总 Prompt</td><td class="nm">${fs(rt.prompt)}</td><td class="nm">${fs(ot.inp||0)}</td></tr>
+        <tr><td>Cache Read</td><td class="nm">${fs(rt.cache_hit)}</td><td class="nm">${fs(ot.cache||0)}</td></tr>
+        <tr><td>真实 Prompt</td><td class="nm hl">${fs(rTP)}</td><td class="nm hl">${fs(oTP)}</td></tr>
+        <tr><td>Output</td><td class="nm">${fs(rt.completion)}</td><td class="nm">${fs(ot.out||0)}</td></tr>
+        <tr><td>总 Token</td><td class="nm hl">${fs(rt.total)}</td><td class="nm hl">${fs(oAll)}</td></tr>
+        <tr><td>请求/会话</td><td class="nm">${rt.requests.toLocaleString()}</td><td class="nm">${ot.sessions||0}</td></tr>
+        <tr><td>费用</td><td class="nm">未计价</td><td class="nm">$${(ot.cost||0).toFixed(2)}</td></tr>`;
+
+    // Chat stats
+    document.getElementById('chat-table').innerHTML=`
+        <tr><td>Reasonix</td><td class="nm">${C.reasonix.sessions}</td><td class="nm">${C.reasonix.messages.toLocaleString()}</td></tr>
+        <tr><td>opencode</td><td class="nm">${C.opencode.sessions}</td><td class="nm">${C.opencode.messages.toLocaleString()}</td></tr>
+        <tr><td><strong>合计</strong></td><td class="nm hl">${C.reasonix.sessions+C.opencode.sessions}</td><td class="nm hl">${(C.reasonix.messages+C.opencode.messages).toLocaleString()}</td></tr>`;
+}
+
+// 初始加载
+refreshData();
+</script>
+</body>
+</html>
