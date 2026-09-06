@@ -293,7 +293,8 @@ def main():
     print(f"\n  按 Ctrl+C 停止服务\n")
     threading.Thread(target=open_browser, daemon=True).start()
     try:
-        ThreadingHTTPServer(('', PORT), Handler).serve_forever()
+        # 仅监听回环地址：空地址会绑定 0.0.0.0，局域网内任何人都能打开面板并导出聊天记录
+        ThreadingHTTPServer(('127.0.0.1', PORT), Handler).serve_forever()
     except KeyboardInterrupt:
         print("\n  服务已停止")
 
