@@ -63,7 +63,7 @@ tr:last-child td{border-bottom:none}tr:hover{background:var(--sm)}
 .cc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);padding:20px;margin:16px 0;overflow-x:auto}
 .cb{display:flex;align-items:flex-end;gap:3px;min-width:100%;height:160px;padding-top:8px}
 .br{flex:1;border-radius:2px 2px 0 0;min-width:4px;transition:height .3s}
-.br-r{background:var(--ac)}.br-o{background:var(--pu)}
+.br-r{background:var(--ac)}.br-o{background:var(--pu)}.br-z{background:var(--gn)}
 .cl{display:flex;gap:2px;margin-top:4px}.cl span{flex:1;text-align:center;font-size:10px;font-family:var(--fm);color:var(--ts);overflow:hidden}
 .clg{display:flex;gap:16px;margin-top:12px;font-size:13px}.clg span{display:flex;align-items:center;gap:6px}.clg .d{width:10px;height:10px;border-radius:2px}
 
@@ -79,7 +79,7 @@ tr:last-child td{border-bottom:none}tr:hover{background:var(--sm)}
 <div class="ct">
 <div class="hd">
     <h1>AI 工具箱</h1>
-    <div class="sub">Reasonix & opencode 用量监控 + 聊天记录管理</div>
+    <div class="sub">Reasonix & opencode & ZCode 用量监控 + 聊天记录管理</div>
     <div class="mt">
         <span id="update-time">加载中...</span>
         <button class="btn" id="btn-refresh" onclick="refreshData()">&#x21bb; 刷新用量</button>
@@ -91,6 +91,7 @@ tr:last-child td{border-bottom:none}tr:hover{background:var(--sm)}
     <button class="on" onclick="showPage('usage',this)">用量总览</button>
     <button onclick="showPage('reasonix',this)">Reasonix</button>
     <button onclick="showPage('opencode',this)">opencode</button>
+    <button onclick="showPage('zcode',this)">ZCode</button>
     <button onclick="showPage('compare',this)">对比</button>
 </div>
 
@@ -99,7 +100,7 @@ tr:last-child td{border-bottom:none}tr:hover{background:var(--sm)}
     <div class="su" id="summary-cards"><div class="ld">正在加载数据...</div></div>
     <div class="sc"><div class="st"><span class="n">01</span> 每日用量趋势（近 30 天）</div>
     <div class="cc"><div class="cb" id="chart"></div><div class="cl" id="chart-labels"></div>
-    <div class="clg"><span><span class="d" style="background:var(--ac)"></span> Reasonix</span><span><span class="d" style="background:var(--pu)"></span> opencode</span></div></div></div>
+    <div class="clg"><span><span class="d" style="background:var(--ac)"></span> Reasonix</span><span><span class="d" style="background:var(--pu)"></span> opencode</span><span><span class="d" style="background:var(--gn)"></span> ZCode</span></div></div></div>
 </div>
 
 <!-- Reasonix -->
@@ -111,18 +112,24 @@ tr:last-child td{border-bottom:none}tr:hover{background:var(--sm)}
 <!-- opencode -->
 <div class="page" id="p-opencode">
     <div class="sc"><div class="st"><span class="n">01</span> 按模型 <span class="bd bd--o" id="o-badge">-</span></div>
-    <div class="tw"><table><thead><tr><th>模型</th><th class="nm">Input</th><th class="nm">Output</th><th class="nm">Reasoning</th><th class="nm">Cache Read</th><th class="nm">费用</th></tr></thead><tbody id="o-models"><tr><td colspan="6" class="ld">加载中...</td></tr></tbody></table></div></div>
+    <div class="tw"><table><thead><tr><th>模型</th><th class="nm">Input</th><th class="nm">Output</th><th class="nm">Reasoning</th><th class="nm">Cache Read</th><th class="nm">总 Token</th></tr></thead><tbody id="o-models"><tr><td colspan="6" class="ld">加载中...</td></tr></tbody></table></div></div>
+</div>
+
+<!-- ZCode -->
+<div class="page" id="p-zcode">
+    <div class="sc"><div class="st"><span class="n">01</span> 按模型 <span class="bd bd--r" id="z-badge" style="color:var(--gn);background:var(--gf)">-</span></div>
+    <div class="tw"><table><thead><tr><th>模型</th><th class="nm">Input</th><th class="nm">Output</th><th class="nm">Reasoning</th><th class="nm">Cache Read</th><th class="nm">总 Token</th></tr></thead><tbody id="z-models"><tr><td colspan="6" class="ld">加载中...</td></tr></tbody></table></div></div>
 </div>
 
 <!-- 对比 -->
 <div class="page" id="p-compare">
     <div class="sc"><div class="st"><span class="n">01</span> 综合对比</div>
-    <div class="tw"><table><thead><tr><th>对比项</th><th class="nm">Reasonix</th><th class="nm">opencode</th></tr></thead><tbody id="cmp-table"><tr><td colspan="3" class="ld">加载中...</td></tr></tbody></table></div></div>
+    <div class="tw"><table><thead><tr><th>对比项</th><th class="nm">Reasonix</th><th class="nm">opencode</th><th class="nm">ZCode</th></tr></thead><tbody id="cmp-table"><tr><td colspan="4" class="ld">加载中...</td></tr></tbody></table></div></div>
     <div class="sc"><div class="st"><span class="n">02</span> 聊天记录统计</div>
     <div class="tw"><table><thead><tr><th>来源</th><th class="nm">会话数</th><th class="nm">对话条数</th></tr></thead><tbody id="chat-table"><tr><td colspan="3" class="ld">加载中...</td></tr></tbody></table></div></div>
 </div>
 
-<div class="ft">数据实时采集自 Reasonix stats/*.jsonl + opencode opencode.db &middot; 本地服务驱动</div>
+<div class="ft">数据实时采集自 Reasonix stats/*.jsonl + opencode opencode.db + ZCode db.sqlite &middot; 本地服务驱动</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -155,27 +162,32 @@ async function exportChats(){
 
 function render(D){
     document.getElementById('update-time').textContent='更新: '+D.time;
-    const R=D.reasonix, O=D.opencode, C=D.chats;
-    const rt=R.totals, ot=O.totals;
+    const R=D.reasonix, O=D.opencode, Z=D.zcode||{models:[],daily:[],totals:{}}, C=D.chats;
+    const rt=R.totals, ot=O.totals, zt=Z.totals||{};
     const oTP=(ot.inp||0)+(ot.cache||0);
+    const zTP=(zt.inp||0)+(zt.cache||0);
     const rTP=rt.prompt+rt.cache_hit;
 
     // Summary
     document.getElementById('summary-cards').innerHTML=`
         <div class="cd cd--a"><div class="cd-l">Reasonix 总 Token</div><div class="cd-v">${fs(rt.total)}</div><div class="cd-s">${rt.requests.toLocaleString()} 次请求</div></div>
-        <div class="cd cd--p"><div class="cd-l">opencode 总 Token</div><div class="cd-v">${fs(oTP)}</div><div class="cd-s">${ot.sessions||0} 个会话 · $${(ot.cost||0).toFixed(2)}</div></div>
-        <div class="cd cd--g"><div class="cd-l">合计总消耗</div><div class="cd-v">${fs(rt.total+oTP)}</div><div class="cd-s">两软件总计</div></div>
+        <div class="cd cd--p"><div class="cd-l">opencode 总 Token</div><div class="cd-v">${fs(oTP)}</div><div class="cd-s">${ot.sessions||0} 个会话</div></div>
+        <div class="cd" style="--cv:var(--gn)"><div class="cd-l">ZCode 总 Token</div><div class="cd-v" style="color:var(--gn)">${fs(zTP)}</div><div class="cd-s">${zt.requests||0} 次请求</div></div>
+        <div class="cd cd--g"><div class="cd-l">合计总消耗</div><div class="cd-v">${fs(rt.total+oTP+zTP)}</div><div class="cd-s">三软件总计</div></div>
         <div class="cd"><div class="cd-l">Reasonix Cache 命中率</div><div class="cd-v">${rt.cache_rate||0}%</div><div class="cd-s">缓存复用节省大量 token</div></div>`;
 
     // Chart
-    const allDates=[...new Set([...Object.keys(R.daily),...O.daily.map(d=>d.date)])].sort();
+    const zdm={};if(Z.daily)Z.daily.forEach(d=>zdm[d.date]=d);
+    const allDates=[...new Set([...Object.keys(R.daily),...O.daily.map(d=>d.date),...Object.keys(zdm)])].sort();
     const d30=allDates.slice(-30);
     const odm={};O.daily.forEach(d=>odm[d.date]=d);
     const vals=d30.map(d=>{
         const rv=R.daily[d]?R.daily[d].tokens:0;
         const od=odm[d]||{};
         const ov=(od.cache||0)+(od.inp||0);
-        return rv+ov;
+        const zd=zdm[d]||{};
+        const zv=(zd.cache||0)+(zd.inp||0);
+        return rv+ov+zv;
     });
     const mx=Math.max(...vals,1);
     const chart=document.getElementById('chart'); chart.innerHTML='';
@@ -184,15 +196,19 @@ function render(D){
         const rv=R.daily[d]?R.daily[d].tokens:0;
         const od=odm[d]||{};
         const ov=(od.cache||0)+(od.inp||0);
-        const total=rv+ov;
+        const zd=zdm[d]||{};
+        const zv=(zd.cache||0)+(zd.inp||0);
+        const total=rv+ov+zv;
         const w=document.createElement('div');w.style.cssText='flex:1;display:flex;gap:1px;align-items:flex-end;height:100%';
         const bR=document.createElement('div');bR.className='br br-r';bR.style.height=Math.max(1,rv/mx*100)+'%';bR.style.flex='1';
         const bO=document.createElement('div');bO.className='br br-o';bO.style.height=Math.max(1,ov/mx*100)+'%';bO.style.flex='1';
+        const bZ=document.createElement('div');bZ.className='br br-z';bZ.style.height=Math.max(1,zv/mx*100)+'%';bZ.style.flex='1';
         // 悬浮窗：当日合计 + 各模型用量
         let tip=d+'  合计: '+fs(total)+'\n';
         tip+='─'.repeat(20)+'\n';
         tip+='Reasonix: '+fs(rv)+'\n';
         tip+='opencode: '+fs(ov)+'\n';
+        tip+='ZCode: '+fs(zv)+'\n';
         tip+='─'.repeat(20)+'\n';
         tip+='【Reasonix 模型】\n';
         Object.entries(R.models).sort((a,b)=>b[1].total-a[1].total).forEach(([m,d])=>{
@@ -203,8 +219,13 @@ function render(D){
             const rp=(m.inp||0)+(m.cache||0);
             if(rp>0) tip+='  '+(m.mid||'?')+': '+fs(rp)+'\n';
         });
-        bR.title=tip; bO.title=tip;
-        w.appendChild(bR);w.appendChild(bO);chart.appendChild(w);
+        tip+='【ZCode 模型】\n';
+        (Z.models||[]).forEach(m=>{
+            const rp=(m.inp||0)+(m.cache||0);
+            if(rp>0) tip+='  '+(m.mid||'?')+': '+fs(rp)+'\n';
+        });
+        bR.title=tip; bO.title=tip; bZ.title=tip;
+        w.appendChild(bR);w.appendChild(bO);w.appendChild(bZ);chart.appendChild(w);
         const l=document.createElement('span');l.textContent=d.slice(5);labels.appendChild(l);
     });
 
@@ -216,22 +237,30 @@ function render(D){
     });document.getElementById('r-models').innerHTML=rh||'<tr><td colspan="6" style="text-align:center;color:var(--ts)">无数据</td></tr>';
 
     // opencode models
-    document.getElementById('o-badge').textContent=(ot.sessions||0)+' 个会话 · $'+(ot.cost||0).toFixed(2);
+    document.getElementById('o-badge').textContent=(ot.sessions||0)+' 个会话';
     let oh='';(O.models||[]).forEach(m=>{
         const rp=(m.inp||0)+(m.cache||0);if(!rp)return;
-        oh+=`<tr><td class="mn">${m.mid||'unknown'}</td><td class="nm">${fs(m.inp)}</td><td class="nm">${fs(m.out)}</td><td class="nm">${fs(m.reason)}</td><td class="nm">${fs(m.cache)}</td><td class="nm">$${(m.cost||0).toFixed(4)}</td></tr>`;
+        oh+=`<tr><td class="mn">${m.mid||'unknown'}</td><td class="nm">${fs(m.inp)}</td><td class="nm">${fs(m.out)}</td><td class="nm">${fs(m.reason)}</td><td class="nm">${fs(m.cache)}</td><td class="nm hl">${fs(rp)}</td></tr>`;
     });document.getElementById('o-models').innerHTML=oh||'<tr><td colspan="6" style="text-align:center;color:var(--ts)">无数据</td></tr>';
+
+    // ZCode models
+    document.getElementById('z-badge').textContent=(zt.requests||0)+' 次请求';
+    let zh='';(Z.models||[]).forEach(m=>{
+        const rp=(m.inp||0)+(m.cache||0);if(!rp)return;
+        zh+=`<tr><td class="mn">${m.mid||'unknown'}</td><td class="nm">${fs(m.inp)}</td><td class="nm">${fs(m.out)}</td><td class="nm">${fs(m.reason)}</td><td class="nm">${fs(m.cache)}</td><td class="nm hl">${fs(m.total)}</td></tr>`;
+    });document.getElementById('z-models').innerHTML=zh||'<tr><td colspan="6" style="text-align:center;color:var(--ts)">无数据</td></tr>';
 
     // Compare
     const oAll=oTP+(ot.out||0);
+    const zAll=zTP+(zt.out||0);
     document.getElementById('cmp-table').innerHTML=`
-        <tr><td>总 Prompt</td><td class="nm">${fs(rt.prompt)}</td><td class="nm">${fs(ot.inp||0)}</td></tr>
-        <tr><td>Cache Read</td><td class="nm">${fs(rt.cache_hit)}</td><td class="nm">${fs(ot.cache||0)}</td></tr>
-        <tr><td>真实 Prompt</td><td class="nm hl">${fs(rTP)}</td><td class="nm hl">${fs(oTP)}</td></tr>
-        <tr><td>Output</td><td class="nm">${fs(rt.completion)}</td><td class="nm">${fs(ot.out||0)}</td></tr>
-        <tr><td>总 Token</td><td class="nm hl">${fs(rt.total)}</td><td class="nm hl">${fs(oAll)}</td></tr>
-        <tr><td>请求/会话</td><td class="nm">${rt.requests.toLocaleString()}</td><td class="nm">${ot.sessions||0}</td></tr>
-        <tr><td>费用</td><td class="nm">未计价</td><td class="nm">$${(ot.cost||0).toFixed(2)}</td></tr>`;
+        <tr><td>总 Prompt</td><td class="nm">${fs(rt.prompt)}</td><td class="nm">${fs(ot.inp||0)}</td><td class="nm">${fs(zt.inp||0)}</td></tr>
+        <tr><td>Cache Read</td><td class="nm">${fs(rt.cache_hit)}</td><td class="nm">${fs(ot.cache||0)}</td><td class="nm">${fs(zt.cache||0)}</td></tr>
+        <tr><td>真实 Prompt</td><td class="nm hl">${fs(rTP)}</td><td class="nm hl">${fs(oTP)}</td><td class="nm hl">${fs(zTP)}</td></tr>
+        <tr><td>Output</td><td class="nm">${fs(rt.completion)}</td><td class="nm">${fs(ot.out||0)}</td><td class="nm">${fs(zt.out||0)}</td></tr>
+        <tr><td>Reasoning</td><td class="nm">-</td><td class="nm">${fs(ot.reason||0)}</td><td class="nm">${fs(zt.reason||0)}</td></tr>
+        <tr><td>总 Token</td><td class="nm hl">${fs(rt.total)}</td><td class="nm hl">${fs(oAll)}</td><td class="nm hl">${fs(zAll)}</td></tr>
+        <tr><td>请求数</td><td class="nm">${rt.requests.toLocaleString()}</td><td class="nm">${ot.sessions||0}</td><td class="nm">${zt.requests||0}</td></tr>`;
 
     // Chat stats
     document.getElementById('chat-table').innerHTML=`

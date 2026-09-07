@@ -18,6 +18,8 @@ BASE = Path(__file__).parent.parent
 REASONIX_DIR = Path(os.environ.get("APPDATA", "")) / "reasonix"
 # opencode 数据库
 OPENCODE_DB = Path.home() / ".local" / "share" / "opencode" / "opencode.db"
+# ZCode 数据库
+ZCODE_DB = Path.home() / ".zcode" / "cli" / "db" / "db.sqlite"
 # 导出目录
 EXPORT_DIR = BASE / "聊天记录"
 
@@ -77,6 +79,31 @@ def get_opencode_stats():
         print(f"[警告] opencode 读取失败: {e}")
         return {"models":[],"daily":[],"totals":{}}
 
+def get_zcode_stats():
+    if not ZCODE_DB.exists(): return {"models":[],"daily":[],"totals":{}}
+    try:
+        conn=sqlite3.connect(str(ZCODE_DB), timeout=5); conn.row_factory=sqlite3.Row; cur=conn.cursor()
+        cur.execute("""SELECT model_id as mid,provider_id as prov,
+            COUNT(*) as requests,SUM(input_tokens) as inp,SUM(output_tokens) as out,
+            SUM(reasoning_tokens) as reason,SUM(cache_read_input_tokens) as cache,
+            SUM(computed_total_tokens) as total
+            FROM model_usage WHERE status='completed' GROUP BY mid,prov ORDER BY total DESC""")
+        models=[dict(r) for r in cur.fetchall()]
+        cur.execute("""SELECT date(started_at/1000,'unixepoch','localtime') as date,COUNT(*) as requests,
+            SUM(input_tokens) as inp,SUM(output_tokens) as out,
+            SUM(reasoning_tokens) as reason,SUM(cache_read_input_tokens) as cache,
+            SUM(computed_total_tokens) as total
+            FROM model_usage WHERE status='completed' GROUP BY date ORDER BY date""")
+        daily=[dict(r) for r in cur.fetchall()]
+        cur.execute("""SELECT COUNT(*) as requests,SUM(input_tokens) as inp,SUM(output_tokens) as out,
+            SUM(reasoning_tokens) as reason,SUM(cache_read_input_tokens) as cache,
+            SUM(computed_total_tokens) as total FROM model_usage WHERE status='completed'""")
+        totals=dict(cur.fetchone()); conn.close()
+        return {"models":models,"daily":daily,"totals":totals}
+    except Exception as e:
+        print(f"[警告] ZCode 读取失败: {e}")
+        return {"models":[],"daily":[],"totals":{}}
+
 def get_chats_stats():
     chats_dir = EXPORT_DIR
     if not chats_dir.exists(): return {"reasonix":{"sessions":0,"messages":0},"opencode":{"sessions":0,"messages":0}}
@@ -88,8 +115,8 @@ def get_chats_stats():
     return {"reasonix":{"sessions":r,"messages":0},"opencode":{"sessions":o,"messages":0}}
 
 def collect_all():
-    R = get_reasonix_stats(); O = get_opencode_stats()
-    return {"reasonix":R,"opencode":O,"chats":get_chats_stats(),"time":datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+    R = get_reasonix_stats(); O = get_opencode_stats(); Z = get_zcode_stats()
+    return {"reasonix":R,"opencode":O,"zcode":Z,"chats":get_chats_stats(),"time":datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 # ========== 导出聊天记录 ==========
 def export_chats():

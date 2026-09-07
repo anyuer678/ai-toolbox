@@ -1,13 +1,13 @@
 # AI Toolbox
 
-本地 AI 编码工具的用量监控 + 聊天记录导出。支持 [Reasonix](https://github.com/nichuanfang/reasonix) 和 [opencode](https://github.com/opencode-ai/opencode)。
+本地 AI 编码工具的用量监控 + 聊天记录导出。支持 [Reasonix](https://github.com/nichuanfang/reasonix)、[opencode](https://github.com/opencode-ai/opencode) 和 [ZCode](https://github.com/anyuer678/zcode)。
 
 ![仪表盘预览](docs/dashboard.png)
 *仪表盘预览（仅模拟数据，非真实数据截图）*
 
 ## 功能
 
-- **用量仪表盘** — 实时查看两个工具的 API Token 消耗、模型分布、每日趋势
+- **用量仪表盘** — 实时查看三个工具的 API Token 消耗、模型分布、每日趋势
 - **聊天记录导出** — 一键将聊天记录导出为 Markdown 文件
 - **悬浮详情** — 图表悬浮显示当日各模型具体用量
 
@@ -16,7 +16,7 @@
 ### 前置条件
 
 - Python 3.10+
-- Reasonix 或 opencode（至少安装一个）
+- Reasonix、opencode 或 ZCode（至少安装一个）
 
 ### 启动
 
@@ -53,6 +53,7 @@ python scripts/server.py
 |------|--------|------|
 | Reasonix | %APPDATA%/reasonix/stats/*.jsonl | Token 用量统计 |
 | opencode | ~/.local/share/opencode/opencode.db | SQLite 数据库 |
+| ZCode | ~/.zcode/cli/db/db.sqlite | SQLite 数据库 |
 
 ## 自定义
 
@@ -62,6 +63,7 @@ python scripts/server.py
 PORT = 9876                          # 服务端口
 REASONIX_DIR = ...                   # Reasonix 数据目录
 OPENCODE_DB = ...                    # opencode 数据库路径
+ZCODE_DB = ...                       # ZCode 数据库路径
 EXPORT_DIR = BASE / "聊天记录"        # 导出目录
 ```
 
