@@ -274,15 +274,16 @@ def export_chats():
 class Handler(SimpleHTTPRequestHandler):
     def do_GET(self):
         try:
-            if self.path == '/api/data':
+            path = self.path.split('?')[0]
+            if path == '/api/data':
                 data = collect_all()
                 self._json_response(200, data)
-            elif self.path == '/api/export':
+            elif path == '/api/export':
                 count, msgs = export_chats()
                 self._json_response(200, {"ok":True,"sessions":count,"messages":msgs,"time":datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
-            elif self.path == '/favicon.ico':
+            elif path == '/favicon.ico':
                 self.send_response(204); self.end_headers()
-            elif self.path == '/' or self.path == '/index.html':
+            elif path == '/' or path == '/index.html':
                 self.path = '/dashboard.html'
                 super().do_GET()
             else:
