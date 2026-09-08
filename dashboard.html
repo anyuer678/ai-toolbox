@@ -144,7 +144,7 @@ async function refreshData(){
     const btn=document.getElementById('btn-refresh');
     btn.disabled=true; btn.innerHTML='<span class="spin">&#x21bb;</span> 采集中...';
     try{
-        const r=await fetch('/api/data'); DATA=await r.json(); render(DATA);
+        const r=await fetch('/api/data?t='+Date.now()); DATA=await r.json(); render(DATA);
         toast('数据已更新 '+DATA.time);
     }catch(e){toast('加载失败: '+e.message,false)}
     btn.disabled=false; btn.innerHTML='&#x21bb; 刷新用量';

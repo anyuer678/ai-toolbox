@@ -82,7 +82,7 @@ def get_opencode_stats():
 def get_zcode_stats():
     if not ZCODE_DB.exists(): return {"models":[],"daily":[],"totals":{}}
     try:
-        conn=sqlite3.connect(str(ZCODE_DB), timeout=5); conn.row_factory=sqlite3.Row; cur=conn.cursor()
+        conn=sqlite3.connect(str(ZCODE_DB), timeout=10); conn.row_factory=sqlite3.Row; cur=conn.cursor()
         cur.execute("""SELECT model_id as mid,provider_id as prov,
             COUNT(*) as requests,SUM(input_tokens) as inp,SUM(output_tokens) as out,
             SUM(reasoning_tokens) as reason,SUM(cache_read_input_tokens) as cache,
