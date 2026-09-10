@@ -154,7 +154,7 @@ async function exportChats(){
     const btn=document.getElementById('btn-export');
     btn.disabled=true; btn.innerHTML='<span class="spin">&#x21e3;</span> 导出中...';
     try{
-        const r=await fetch('/api/export'); const d=await r.json();
+        const r=await fetch('/api/export',{method:'POST'}); const d=await r.json();
         toast(`导出完成！${d.sessions} 个会话, ${d.messages} 条消息`);
     }catch(e){toast('导出失败: '+e.message,false)}
     btn.disabled=false; btn.innerHTML='&#x21e3; 导出聊天记录';

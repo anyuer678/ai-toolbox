@@ -9,6 +9,7 @@ from datetime import datetime
 from collections import defaultdict
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from http.server import ThreadingHTTPServer
+from urllib.parse import urlparse
 
 PORT = 9876
 BASE = Path(__file__).parent.parent
@@ -276,11 +277,13 @@ class Handler(SimpleHTTPRequestHandler):
         try:
             path = self.path.split('?')[0]
             if path == '/api/data':
+                if not self._same_origin():
+                    self._json_response(403, {"error": "cross-origin rejected"}); return
                 data = collect_all()
                 self._json_response(200, data)
             elif path == '/api/export':
-                count, msgs = export_chats()
-                self._json_response(200, {"ok":True,"sessions":count,"messages":msgs,"time":datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
+                # 有副作用（写文件）→ 移到 do_POST
+                self._json_response(405, {"error": "use POST /api/export"})
             elif path == '/favicon.ico':
                 self.send_response(204); self.end_headers()
             elif path == '/' or path == '/index.html':
@@ -296,12 +299,43 @@ class Handler(SimpleHTTPRequestHandler):
             except:
                 pass
 
+    def do_POST(self):
+        if not self._same_origin():
+            self._json_response(403, {"error": "cross-origin rejected"}); return
+        try:
+            path = self.path.split('?')[0]
+            if path == '/api/export':
+                count, msgs = export_chats()
+                self._json_response(200, {"ok":True,"sessions":count,"messages":msgs,"time":datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
+            else:
+                self._json_response(404, {"error": "not found"})
+        except Exception as e:
+            print(f"[ERROR] {self.path}: {e}")
+            self._json_response(500, {"error": str(e)})
+
+    _LOCAL_HOSTS = {'127.0.0.1', 'localhost', '::1'}
+
+    def _same_origin(self) -> bool:
+        host = (self.headers.get('Host') or '').rsplit(':', 1)[0].strip('[]').lower()
+        if host not in self._LOCAL_HOSTS:
+            return False
+        origin = self.headers.get('Origin')
+        if not origin:
+            return True
+        ohost = (urlparse(origin).hostname or '').lower()
+        return ohost in self._LOCAL_HOSTS
+
     def _json_response(self, code, data):
         body = json.dumps(data, ensure_ascii=False).encode('utf-8')
         self.send_response(code)
         self.send_header('Content-Type','application/json; charset=utf-8')
         self.send_header('Content-Length', str(len(body)))
-        self.send_header('Access-Control-Allow-Origin','*')
+        # CORS: 仅回显本机来源，防止跨站请求借本机代理调 API
+        origin = self.headers.get('Origin')
+        if origin:
+            ohost = (urlparse(origin).hostname or '').lower()
+            if ohost in self._LOCAL_HOSTS:
+                self.send_header('Access-Control-Allow-Origin', origin)
         self.end_headers()
         self.wfile.write(body)
 
