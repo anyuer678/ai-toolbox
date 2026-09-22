@@ -22,3 +22,8 @@ jobs:
         run: |
           grep -q "127.0.0.1" scripts/server.py
           echo "PASS: bind localhost"
+
+      - name: Unit tests
+        run: |
+          pip install pytest
+          python -m pytest tests -q

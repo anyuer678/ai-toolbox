@@ -76,3 +76,11 @@ EXPORT_DIR = BASE / "聊天记录"        # 导出目录
 ## License
 
 MIT
+
+## 测试
+
+`ash
+python -m pytest tests -q
+`
+
+覆盖 safe_fn 清洗、Reasonix jsonl 汇总容错、collect_all 键结构。
