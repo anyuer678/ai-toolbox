@@ -1,6 +1,6 @@
 # AI Toolbox
 
-本地 AI 编码工具的用量监控 + 聊天记录导出。支持 [Reasonix](https://github.com/nichuanfang/reasonix)、[opencode](https://github.com/opencode-ai/opencode) 和 [ZCode](https://github.com/anyuer678/zcode)。
+本地 AI 编码工具的用量监控 + 聊天记录导出。支持 [Reasonix](https://github.com/esengine/DeepSeek-Reasonix)、[opencode](https://github.com/opencode-ai/opencode) 和 [ZCode](https://github.com/zai-org/ZCode)。
 
 ![仪表盘预览](docs/dashboard.png)
 *仪表盘预览（仅模拟数据，非真实数据截图）*
@@ -79,8 +79,8 @@ MIT
 
 ## 测试
 
-`ash
+```bash
 python -m pytest tests -q
-`
+```
 
 覆盖 safe_fn 清洗、Reasonix jsonl 汇总容错、collect_all 键结构。
