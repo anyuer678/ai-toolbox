@@ -1,5 +1,7 @@
 # AI Toolbox
 
+![CI](https://github.com/anyuer678/ai-toolbox/actions/workflows/ci.yml/badge.svg) ![License](https://img.shields.io/github/license/anyuer678/ai-toolbox) ![Top language](https://img.shields.io/github/languages/top/anyuer678/ai-toolbox)
+
 本地 AI 编码工具的用量监控 + 聊天记录导出。支持 [Reasonix](https://github.com/esengine/DeepSeek-Reasonix)、[opencode](https://github.com/opencode-ai/opencode) 和 [ZCode](https://github.com/zai-org/ZCode)。
 
 ![仪表盘预览](docs/dashboard.png)
